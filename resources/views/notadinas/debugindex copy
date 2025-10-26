@@ -1,0 +1,192 @@
+
+@extends('layout.v_template')
+@section('title','Nota Dinas')
+@section('bawah','kelola Nota Dinas Internal PDAM')
+@section('content')
+
+                <!-- Begin Page Content -->
+                <div class="container-fluid">
+  <!-- Page Heading -->
+                    {{-- <h1 class="h3 mb-2 text-gray-800">Tables</h1> --}}
+                    <p class="mb-4">Tabel Nota Dinas
+                        </p>
+
+                    <!-- DataTales Example -->
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Tabel Nota DInas</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered notadinasTable" id="notadinasTable" name="notadinas"width="100%" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Nomor Nota</th>
+                                            <th>Isi Nota</th>
+                                              <th>Isi Nota</th>
+                                                 <th>haSUIL sTATUS</th>
+                                                 <th>aksi</th>
+                                            <!-- <th>Tanggal Nota</th>
+                                            <th>Perihal</th>
+                                            <th>Isi Nota</th>
+                                           
+                                            <th>Status</th>
+                                            <th>Tindakan</th> -->
+                                            <!-- <th>Disposisi</th>
+                                             <th>Status Surat</th> -->
+                                           
+                                            <!-- <th>Dibuat Oleh</th>
+                                            <th>Aksi</th>  -->
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                    </tbody>
+                                   
+                                </table>
+                                 @include('notadinas._edit_modal') 
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- /.container-fluid -->
+            </div>
+        </div>
+<!-- @include('notadinas._add_modal') -->
+
+@endsection
+@push('scripts')
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+        crossorigin="anonymous"></script>
+<!-- <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script> -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" 
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" 
+        crossorigin="anonymous"></script>
+
+<script>
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+
+    // Fungsi untuk memuat dan merender data ke dalam tabel
+    function loadNotaDinasTable() {
+        $.ajax({
+            type: "GET",
+            url: "allData",
+            success: function(response) {
+                console.log(response);
+                let tableHtml = "";
+
+                if (response && Array.isArray(response.data)) {
+                    $.each(response.data, function(index, value) {
+                        tableHtml += `
+                            <tr>
+                                <td>${index + 1}</td>
+                                <td>${value.nomor_nota || ''}</td>
+                                <td>${value.isi_nota || ''}</td>
+                                <td>
+                                    <button class="btn btn-success update-status" data-id="${value.id}" data-status="disetujui">Disetujui</button>
+                                    <button class="btn btn-warning update-status" data-id="${value.id}" data-status="ditunda">Pending</button>
+                                    <button class="btn btn-danger update-status" data-id="${value.id}" data-status="ditolak">Reject</button>
+                                </td>
+                                
+
+                                <td>${value.status || ''}</td>
+                                 <td>
+                                 
+                                 
+                              <a href="#" class="btn btn-primary btn-sm editIcon" data-id="${value.id}" data-bs-toggle="modal" data-bs-target="#editNotaModal">Edit</a>
+                                </tr>
+                        `;
+                    });
+                } else {
+                    tableHtml = `<tr><td colspan="4">Tidak ada data</td></tr>`;
+                }
+
+                $("#notadinasTable tbody").html(tableHtml);
+            },
+            error: function(xhr, status, error) {
+                console.error("Error fetching data:", error);
+                $("#notadinasTable tbody").html(`<tr><td colspan="4">Gagal memuat data</td></tr>`);
+            }
+        });
+    }
+
+    // Event delegation untuk tombol status
+    $(document).on('click', '.update-status', function () {
+        const id = $(this).data('id');
+        const status = $(this).data('status');
+
+        if (!id || !status) {
+            alert("Data tidak valid.");
+            return;
+        }
+
+        if (!confirm(`Yakin ubah status menjadi "${status}"?`)) return;
+
+        $.ajax({
+            
+            url: "/notdin/update/status",
+            type: "POST",
+              data: { id: id, status: status },
+           success: function (response) {
+        console.log("Update sukses:", response);
+        alert(response.message || "Status berhasil diperbarui.");
+        loadNotaDinasTable(); // ← ini HARUS jalan
+    },
+    error: function (xhr, status, error) {
+        console.error("AJAX Error:", error);
+        console.error("Response:", xhr.responseText);
+        alert("Gagal update: " + (xhr.responseJSON?.message || error));
+    }
+});
+    });
+  // Tampilkan data di modal saat tombol edit diklik
+    $(document).on('click', '.editIcon', function(e) {
+        e.preventDefault();
+        const id = $(this).data('id');
+        $.ajax({
+          url: "{{ url('notadinas/edit') }}/" + id,
+          method: 'get',
+          data: {
+            id: id,
+            _token: '{{ csrf_token() }}'
+          },
+        success: function(data) {
+            $('#editNotaModal').modal('show');
+           $('#edit_id').val(data.id);
+            $('#edit_nomor_nota').val(data.nomor_nota);
+
+
+            $('#edit_isi_nota').val(data.isi_nota);
+             $('#edit_lampiran').val(data.lampiran);
+              $('#edit_status').val(data.status);
+               $('#edit_nama').val(data.nama);
+            //    alert(data.created_by.nama);
+                $('#edit_isi_nota').val(data.isi_nota);
+                 $('#edit_approved_by').val(data.approved_by);
+                 $('#edit_approved_at').val(data.approved_at);
+                 $('#edit_created_at').val(data.created_at)
+          
+        }
+        }).fail(function() {
+            alert('Gagal memuat data untuk diedit.');
+        });
+    });
+
+    
+    // Muat data saat halaman siap
+    $(document).ready(function() {
+        loadNotaDinasTable();
+    });
+</script>
+
+
+@endpush
+  
+<a href="#" class="btn btn-primary btn-sm editIcon" data-id="${value.id}" data-bs-toggle="modal" data-bs-target="#editNotaModal">Edit</a>

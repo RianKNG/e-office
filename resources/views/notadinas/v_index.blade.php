@@ -1,0 +1,423 @@
+
+@extends('layout.v_template')
+@section('title','Nota Dinas')
+@section('bawah','kelola Nota Dinas Internal PDAM')
+@section('content')
+
+                <div class="container-fluid">
+    <div class="card shadow mb-4">
+        
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            
+            <h6 class="m-0 font-weight-bold text-primary">Tabel Nota Dinas</h6>
+            
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+                Tambah Data
+            </button>
+        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered notadinasTable" id="notadinasTable" name="notadinas"width="100%" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <tr>
+                        <!-- <th>ID</th> -->
+                                                 <th>NO </th>
+                                                <th>nomor_nota </th>
+                                                <th>tanggal_nota</th>
+                                                <th>perihal</th>
+                                                <!-- <th>isi_nota </th> -->
+                                                <th>lampiran </th>
+                                                <th>status </th>
+                                                <th>created_by </th>
+                                                <th>approved_by </th>
+                                                <th>approved_at </th>
+                                                <th>created_at</th>
+                                                <th>persetujuan</th>
+                                                <th>Aksi</th>
+                                            
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                    </tbody>
+                                   
+                                </table>
+                                 @include('notadinas._edit_modal') 
+                                 
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- /.container-fluid -->
+            </div>
+        </div>
+        </div>
+        </div>
+         @include('notadinas._disposisi_modal') 
+@include('notadinas._add_modal')
+ <!-- <div class="modal fade" id="editModalCoba">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="editForm" enctype="multipart/form-data">
+                <input type="hidden" id="edit_id" name="id">
+                <div class="modal-header">
+                    <h5>Edit Nota Dinas</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" id="edit_nomor_nota" name="nomor_nota" class="form-control mb-2" required>
+                    <input type="date" id="edit_tanggal_nota" name="tanggal_nota" class="form-control mb-2" required>
+                    <input type="text" id="edit_perihal" name="perihal" class="form-control mb-2" required>
+                    <textarea id="edit_isi_nota" name="isi_nota" class="form-control mb-2" required></textarea>
+                    <input type="file" name="lampiran" class="form-control mb-2" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                    <small class="text-muted">Biarkan kosong jika tidak ingin mengganti lampiran.</small>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div> -->
+
+@endsection
+@push('scripts')
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+        crossorigin="anonymous"></script>
+<!-- <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script> -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" 
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" 
+        crossorigin="anonymous"></script>
+
+<script>
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+
+    // Fungsi untuk memuat dan merender data ke dalam tabel
+    function loadNotaDinasTable() {
+        $.ajax({
+            type: "GET",
+            url: "allData",
+            success: function(response) {
+                console.log(response);
+                let tableHtml = "";
+                 let statusColor = '';
+             
+
+                if (response && Array.isArray(response.data)) {
+                    $.each(response.data, function(index, value) {
+                           if (value.status === 'disetujui') {
+                            statusColor = 'bg-success text-white';
+                        } else if (value.status === 'menunggu') {
+                            statusColor = 'bg-warning text-dark';
+                        } else if (value.status === 'selesai') {
+                            statusColor = 'bg-primary text-white';
+                        } else if (value.status === 'draf') {
+                            statusColor = 'bg-danger text-white';
+                        } else {
+                            statusColor = 'bg-secondary text-white'; // default kalau status tidak dikenal
+                       }
+                        tableHtml += `
+                            <tr>
+                                <td>${index + 1}</td>
+                                <td>${value.nomor_nota || ''}</td>
+                                <td>${value.tanggal_nota || ''}</td>
+                                <td>${value.isi_nota || ''}</td>
+                                <td>${value.lampiran}</td>
+                                <td class="${statusColor} text-center fw-bold">
+                                    ${value.status}
+                                </td>
+                                <td>${value.created_by}</td>
+                                <td>${value.approved_by}</td>
+                                <td>${value.approved_at}</td>
+                                <td>${value.created_at}</td>
+                                <td>
+                                    <button class="btn btn-success btn-sm update-status" data-id="${value.id}" data-status="disetujui"><i class="fas fa-check-circle"></i></button>
+                                    <button class="btn btn-warning btn-sm update-status" data-id="${value.id}" data-status="menunggu"><i class="fas fa-hourglass-half"></i></button>
+                                    <button class="btn btn-primary btn-sm update-status" data-id="${value.id}" data-status="selesai"><i class="far fa-frown"></i></button>
+                                     <button class="btn btn-danger btn-sm update-status" data-id="${value.id}" data-status="draf"><i class="fas fa-times-circle"></i></button>
+                                </td>
+                                 <td>
+                                   <button class='btn btn-primary btn-xm' data-toggle='modal' data-target='#editModal' onclick='editData("${value.id}")'><i class="fas fa-edit"></i></button>
+                                  <button class='btn btn-info btn-xm' onclick='openDisposisiModal("${value.id}")'>
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                   
+                                </tr>
+                        `;
+                    });
+                } else {
+                    tableHtml = `<tr><td colspan="4">Tidak ada data</td></tr>`;
+                }
+
+                $("#notadinasTable tbody").html(tableHtml);
+            },
+            error: function(xhr, status, error) {
+                console.error("Error fetching data:", error);
+                $("#notadinasTable tbody").html(`<tr><td colspan="4">Gagal memuat data</td></tr>`);
+            }
+        });
+    }
+
+    // Event delegation untuk tombol status
+    $(document).on('click', '.update-status', function () {
+        const id = $(this).data('id');
+        const status = $(this).data('status');
+
+        if (!id || !status) {
+            alert("Data tidak valid.");
+            return;
+        }
+
+        if (!confirm(`Yakin ubah status menjadi "${status}"?`)) return;
+
+        $.ajax({
+            
+            url: "/notdin/update/status",
+            type: "POST",
+              data: { id: id, status: status },
+           success: function (response) {
+        console.log("Update sukses:", response);
+        alert(response.message || "Status berhasil diperbarui.");
+        loadNotaDinasTable(); // ← ini HARUS jalan
+    },
+    error: function (xhr, status, error) {
+        console.error("AJAX Error:", error);
+        console.error("Response:", xhr.responseText);
+        alert("Gagal update: " + (xhr.responseJSON?.message || error));
+        }
+       });
+    });
+
+     // === EDIT ===
+function editData(id) {
+    $.ajax({
+          url: `/notadinas/edit/${id}`,
+        // url: `/notadinas/${id}/edit`,
+        type: "GET",
+        dataType: "json",
+        success: function (data) {
+            // Tampilkan modal edit (gunakan ID modal yang benar)
+            $('#editData').modal('show');
+
+            // Isi form edit dengan data yang didapat
+            $('#edit_id').val(data.id);
+            $('#edit_nomor_nota').val(data.nomor_nota);
+            $('#edit_tanggal_nota').val(data.tanggal_nota);
+            $('#edit_perihal').val(data.perihal);
+            $('#edit_isi_nota').val(data.isi_nota);
+            $('#edit_lampiran').val('');
+            $('#edit_status').val(data.status);
+            $('#edit_created_by').val(data.created_by);
+            $('#edit_approved_by').val(data.approved_by);
+            // $('#edit_approved_at').val(data.approved_at);
+            // $('#edit_created_at').val(data.created_at);
+            $('#edit_nama').val(data.nama);
+        },
+        error: function (xhr) {
+            console.error(xhr.responseText);
+            alert("Gagal memuat data untuk diedit.");
+        }
+    });
+}
+// function editData(id) {
+//     $.ajax({
+//         url: `/notadinas/${id}/edit`,
+//         type: "GET",
+//         success: function (data) {
+//             // Tampilkan modal edit
+//            $('#editData').modal('show');
+//             // Isi form edit dengan data yang didapat
+//             $('#edit_id').val(data.id);
+//             $('#edit_nomor_nota').val(data.nomor_nota);
+//             $('#edit_tanggal_nota').val(data.tanggal_nota);
+//             $('#edit_perihal').val(data.perihal);
+//             $('#edit_isi_nota').val(data.isi_nota);
+//             $('#edit_lampiran').val(data.lampiran);
+//             $('#edit_status').val(data.status);
+//             $('#edit_created_by').val(data.created_by)
+//             $('#edit_approved_by').val(data.approved_by);
+//             $('#edit_approved_at').val(data.approved_at);
+//             $('#edit_created_at').val(data.created_at)
+//             $('#edit_nama').val(data.nama);
+//         },
+//         error: function (xhr) {
+//             console.error(xhr);
+//             alert("Gagal memuat data untuk diedit.");
+//         }
+//     });
+// }
+
+
+     // -------------------------------------satart update data--------------------------------------
+        //  function updateData(id){
+        //     var url = "{{URL::to('/notadinas')}}";
+        //     // alert(id);
+    
+        //     var id=$('#id').val();
+        //     var nomor_nota =$('#edit_nomor_nota ').val();
+        //     var tanggal_nota=$('#edit_tanggal_nota').val();
+        //     var perihal=$('#edit_perihal').val();
+        //     var isi_nota=$('#edit_isi_nota ').val();
+        //     var lampiran=$('#edit_lampiran ').val();
+        //     var status=$('#edit_status ').val();
+        //     var created_by =$('#edit_created_by').val();
+        //     var approved_by=$('#edit_approved_by ').val();
+        //     var approved_at =$('#edit_approved_at ').val();
+        //     var  created_at=$('#edit_created_a').val();
+        //     $.ajax({
+        //         type:"POST",
+        //         dataType:"json",
+        //         data:{
+        //           _token: $('meta[name="csrf-token"]').attr('content'),
+        //         nomor_nota:nomor_nota,
+        //             tanggal_nota:tanggal_nota,
+        //             perihal:perihal,
+        //             isi_nota:isi_nota,
+        //             lampiran:lampiran,
+        //             status:status,
+        //             created_by:created_by,
+        //             approved_by:approved_by,
+        //             approved_at:approved_at,
+        //             created_at:created_at},
+                
+        //         url:url +"/update/"+id,
+        //         success:function(data){
+        //             console.log(data);
+        //             // clearData();
+        //             // allData();
+        //             // $('#id').val(data.id);
+        //             // $('#kodeU').val(data.kode);
+        //             // $('#nama_wilayahU').val(data.nama_wilayah);
+        //             console.log('data berhasil diupdate');
+        //         },
+        //         error: function(error){
+        //                 // $('#kodeErrorU').text('error.responseJSON.errors.kodeU');
+        //                 // $('#nama_wilayahErrorU').text('error.responseJSON.errors.nama_wilayahU');
+        //             //     console.log(error.responseJSON.errors.kodeU);
+        //             //     console.log(error.responseJSON.errors.nama_wilayahU);
+        //             //    console.log(error.responseJSON.errors.nama_wilayahU);
+        //         }
+        //     })
+        // }
+        // -------------------------------------end update from data--------------------------------------
+        function updateData() {
+    var id = $('#edit_id').val(); // ambil ID dari form
+    var formData = new FormData();
+    formData.append('_token', $('meta[name="csrf-token"]').attr('content'));
+    formData.append('_method', 'POST'); // spoof method PUT
+
+    formData.append('nomor_nota', $('#edit_nomor_nota').val());
+    formData.append('tanggal_nota', $('#edit_tanggal_nota').val());
+    formData.append('perihal', $('#edit_perihal').val());
+    formData.append('isi_nota', $('#edit_isi_nota').val());
+    formData.append('status', $('#edit_status').val());
+    formData.append('created_by', $('#edit_created_by').val());
+    formData.append('approved_by', $('#edit_approved_by').val());
+    // formData.append('approved_at', $('#edit_approved_at').val());
+    // formData.append('created_at', $('#edit_created_at').val());
+    // formData.append('nama', $('#edit_nama').val());
+
+    // Jika ada file lampiran
+    if ($('#edit_lampiran')[0].files.length > 0) {
+        formData.append('lampiran', $('#edit_lampiran')[0].files[0]);
+    }
+
+    $.ajax({
+            url: `/notadinas/update/${id}`,
+        // url: '/notadinas/update/' + id,
+        type: 'POST', // tetap POST, tapi kita spoof PUT
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (response) {
+            $('#editData').modal('hide');
+            alert('Data berhasil diupdate!');
+            $('#allData').DataTable().ajax.reload(); // reload tabel
+        },
+        error: function (xhr) {
+            console.error(xhr.responseText);
+            alert('Terjadi kesalahan saat update data.');
+        }
+    });
+}
+
+function openDisposisiModal(id) {
+    $('#nota_id').val(id);
+    $('#disposisiModal').modal('show');
+}
+
+$('#formDisposisi').on('submit', function(e) {
+    e.preventDefault();
+     let formData = new FormData(this);
+    formData.append('_token', $('meta[name="csrf-token"]').attr('content'));
+    const id = $('#nota_id').val();
+
+    $.ajax({
+         url: `/notadinas/disposisi/${id}`,
+     
+        method: 'POST',
+        data: {
+            nomor_disposisi: $('#nomor_disposisi').val(),
+            instruksi: $('#instruksi').val(),
+              catatan: $('#catatan').val(),
+               batas_waktu: $('#batas_waktu').val(),
+                prioritas: $('#prioritas').val(),
+                status: $('#status').val(),
+            _token: $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function(res) {
+            alert(res.message);
+            $('#disposisiModal').modal('hide');
+            $('#nomor_disposisi').val('');
+            $('#instruksi').val('');
+              $('#catatan').val('');
+               $('#batas_waktu').val('');
+                $('#prioritas').val('');
+                  $('#status').val('');
+            loadDisposisi(id); // reload daftar disposisi
+        },
+        error: function(xhr) {
+            console.error(xhr.responseText);
+            alert('Gagal menyimpan disposisi');
+        }
+    });
+});
+// function loadDisposisi(id) {
+//     $.ajax({
+//           url: `/notadinas/disposisi/${id}`,
+//         // url: `/notadinas/${id}/disposisi`,
+//         method: 'GET',
+//         success: function(data) {
+//             let html = '';
+//             $.each(data, function(index, d) {
+//                 html += `
+//                     <tr>
+//                         <td>${index + 1}</td>
+//                         <td>${d.tujuan_disposisi}</td>
+//                         <td>${d.isi_disposisi}</td>
+//                         <td>${d.nama_user || '-'}</td>
+//                         <td>${d.created_at}</td>
+//                     </tr>
+//                 `;
+//             });
+//             $('#tabelDisposisi tbody').html(html);
+//         }
+//     });
+// }
+
+
+    // Muat data saat halaman siap
+    $(document).ready(function() {
+        loadNotaDinasTable();
+    });
+</script>
+
+
+@endpush
