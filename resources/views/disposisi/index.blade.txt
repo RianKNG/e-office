@@ -1,0 +1,317 @@
+@extends('layout.v_template')
+@section('title','Disposisi')
+@section('bawah','Kelola Disposisi Surat Masuk dan Nota Dinas')
+@section('content')
+
+<div class="container-fluid">
+    <!-- Statistik Card (Placeholder) -->
+    <div class="row">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Disposisi</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $gabungan->count() ?? 0 }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-folder-open fa-2x text-gray-300"></i>
+                        </div>
+                    </div>$dis
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Menunggu</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ $gabungan->where('status', 'menunggu')->count() ?? 0 }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clock fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Selesai</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ $gabungan->where('status', 'selesai')->count() ?? 0 }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Pegawai Aktif</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ $pegawai_aktif ?? 0 }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tombol Tambah -->
+    <div class="d-flex justify-content-between mb-3">
+        <h5>Daftar Disposisi</h5>
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalTambah">
+            <i class="fas fa-plus"></i> Tambah Disposisi
+        </button>
+    </div>
+
+    <!-- Tabel Disposisi -->
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Jenis</th>
+                            <th>Nomor Dokumen</th>
+                            <th>Dari</th>
+                            <th>Kepada</th>
+                            <th>Instruksi</th>
+                            <th>Tanggal</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if(isset($gabungan))
+                            @foreach (collect($gabungan)->paginate(10) as $index => $item)
+                            <tr>
+                                <td>{{ $loop->iteration + ($gabungan->currentPage() - 1) * 10 }}</td>
+                                <td>
+                                    @if($item['jenis'] === 'surat')
+                                        <span class="badge badge-primary">Surat</span>
+                                    @else
+                                        <span class="badge badge-info">Nota</span>
+                                    @endif
+                                </td>
+                                <td>{{ $item['nomor_dokumen'] }}</td>
+                                <td>{{ $item['dari_nama'] }}</td>
+                                <td>{{ $item['kepada_nama'] }}</td>
+                                <td>{{ Str::limit($item['instruksi'], 30) }}</td>
+                                <td>{{ $item['created_at'] ? \Carbon\Carbon::parse($item['created_at'])->format('d M Y') : '—' }}</td>
+                                <td>
+                                    @if($item['status'] === 'menunggu')
+                                        <span class="badge badge-warning">Menunggu</span>
+                                    @elseif($item['status'] === 'diproses')
+                                        <span class="badge badge-info">Diproses</span>
+                                    @else
+                                        <span class="badge badge-success">Selesai</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-info btn-view"
+                                        data-id="{{ $item['id'] }}" data-jenis="{{ $item['jenis'] }}">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-primary btn-edit"
+                                        data-id="{{ $item['id'] }}" data-jenis="{{ $item['jenis'] }}"
+                                        data-toggle="modal" data-target="#modalEdit">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            @endforeach
+                        @endif
+                    </tbody>
+                </table>
+
+                <!-- Paginasi Manual (karena kita paginate di view) -->
+                @if(isset($gabungan))
+                    {{ $gabungan->paginate(10)->links() }}
+                @endif
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Tambah Disposisi -->
+<div class="modal fade" id="modalTambah" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ route('disposisi.store') }}" method="POST">
+                @csrf
+                <div class="modal-header">
+                    <h5 class="modal-title">Tambah Disposisi Baru</h5>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Jenis Dokumen</label>
+                        <select class="form-control" id="jenis_dokumen" required>
+                            <option value="">Pilih Jenis</option>
+                            <option value="surat">Surat Masuk</option>
+                            <option value="nota">Nota Dinas</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Nomor Dokumen</label>
+                        <select class="form-control" name="id_dokumen" id="select_dokumen" required>
+                            <option value="">Pilih Dokumen</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Kepada User</label>
+                        <select class="form-control" name="kepada_user" required>
+                            @foreach($users as $user)
+                                <option value="{{ $user->id }}">{{ $user->nama_lengkap }} ({{ $user->jabatan ?? '—' }})</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Instruksi</label>
+                        <textarea class="form-control" name="instruksi" rows="3" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Catatan</label>
+                        <textarea class="form-control" name="catatan" rows="2"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Batas Waktu</label>
+                        <input type="date" class="form-control" name="batas_waktu">
+                    </div>
+                    <div class="form-group">
+                        <label>Prioritas</label>
+                        <select class="form-control" name="prioritas">
+                            <option value="rendah">Rendah</option>
+                            <option value="sedang" selected>Sedang</option>
+                            <option value="tinggi">Tinggi</option>
+                            <option value="segera">Segera</option>
+                        </select>
+                    </div>
+                    <input type="hidden" name="jenis" id="hidden_jenis">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Edit Disposisi -->
+<div class="modal fade" id="modalEdit" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="formEdit" method="POST">
+                @csrf
+                @method('PUT')
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Disposisi</h5>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Nomor Dokumen</label>
+                        <input type="text" class="form-control" id="edit_nomor_dokumen" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label>Dari</label>
+                        <input type="text" class="form-control" id="edit_dari" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label>Kepada User</label>
+                        <select class="form-control" name="kepada_user" id="edit_kepada_user" required>
+                            @foreach($users as $user)
+                                <option value="{{ $user->id }}">{{ $user->nama_lengkap }} ({{ $user->jabatan ?? '—' }})</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Instruksi</label>
+                        <textarea class="form-control" name="instruksi" id="edit_instruksi" rows="3" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Catatan</label>
+                        <textarea class="form-control" name="catatan" id="edit_catatan" rows="2"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Batas Waktu</label>
+                        <input type="date" class="form-control" name="batas_waktu" id="edit_batas_waktu">
+                    </div>
+                    <div class="form-group">
+                        <label>Prioritas</label>
+                        <select class="form-control" name="prioritas" id="edit_prioritas">
+                            <option value="rendah">Rendah</option>
+                            <option value="sedang">Sedang</option>
+                            <option value="tinggi">Tinggi</option>
+                            <option value="segera">Segera</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@endsection
+
+@push('scripts')
+<script>
+$(document).ready(function () {
+    // Simulasi load dokumen berdasarkan jenis (asumsi data tersedia via JSON)
+    @php
+        $suratList = isset($suratList) ? $suratList : [];
+        $notaList = isset($notaList) ? $notaList : [];
+    @endphp
+
+    const suratList = @json($suratList);
+    const notaList = @json($notaList);
+
+    $('#jenis_dokumen').change(function () {
+        const jenis = $(this).val();
+        const select = $('#select_dokumen');
+        select.empty().append('<option value="">Pilih Dokumen</option>');
+        $('#hidden_jenis').val(jenis);
+
+        if (jenis === 'surat') {
+            suratList.forEach(item => {
+                select.append(`<option value="${item.id}">${item.nomor_surat}</option>`);
+            });
+        } else if (jenis === 'nota') {
+            notaList.forEach(item => {
+                select.append(`<option value="${item.id}">${item.nomor_nota}</option>`);
+            });
+        }
+    });
+
+    // Isi modal edit saat tombol diklik
+    $('.btn-edit').click(function () {
+        // Di implementasi nyata, ini diisi via AJAX
+        // Untuk refactor view, cukup siapkan struktur
+    });
+});
+</script>
+@endpush

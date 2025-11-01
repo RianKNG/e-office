@@ -117,43 +117,34 @@
                         <div class="card-body">
                             <div class="table-responsive">
                                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                                <thead>
-                                    <tr>
-                                        <th>No</th>
-                                        <th>Jenis</th>
-                                        <th>Nomor</th>
-                                        <th>Perihal</th>
-                                        <th>Dari</th>
-                                        <th>Tanggal</th>
-                                        <th>Status</th>
-                                        <th>Aksi</th>
-                                    </tr>
-                                </thead>
-                            </table>
-
-                            @push('scripts')
-                            <script>
-                            $(document).ready(function () {
-                                $('#dataTable').DataTable({
-                                    processing: true,
-                                    serverSide: false, // karena kita kirim semua data sekaligus
-                                    ajax: "{{ route('disposisi.sumber') }}", // pastikan route ada
-                                    columns: [
-                                        { data: null, render: function(data, type, row, meta) { return meta.row + 1; } },
-                                        { data: 'jenis', render: function(d) { return d === 'surat' ? 'Surat Masuk' : 'Nota Dinas'; } },
-                                        { data: 'nomor' },
-                                        { data: 'perihal' },
-                                        { data: 'dari_nama' },
-                                        { data: 'tanggal' },
-                                        { data: 'sudah_disposisi', render: function(d) { return d ? '<span class="badge badge-success">Sudah</span>' : '<span class="badge badge-warning">Belum</span>'; } },
-                                        { data: null, render: function(data) {
-                                            return `<a href="/disposisi/buat/${data.jenis}/${data.entitas_id}" class="btn btn-sm btn-primary">Disposisi</a>`;
-                                        }}
-                                    ]
-                                });
-                            });
-                            </script>
-                            @endpush
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Nomor Surat</th>
+                                            <th>Dari User</th>
+                                            <th>Kepada User</th>
+                                            <th>Instruksi</th>
+                                             <th>Nomor Surat</th>
+                                            <th>Waktu</th>
+                                            {{-- <th>Aksi</th> --}}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                         @foreach ($data as $index => $dn)
+                                        <tr>
+                                            <td>{{ $loop->iteration }}</td> 
+                                            <td>{{ $dn->nomor_disposisi }}</td> 
+                                            <td>{{ $dn->username }}</td>
+                                            <td>{{ $dn->username }}</td>
+                                               <td>{{ $dn->instruksi }}</td>
+                                                  <td>{{ $dn->nomor_surat }}</td>
+                                                   <td>{{ $dn->created_at }}</td>
+                                                   
+                                           
+                                        </tr>   
+                                         @endforeach                         
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>

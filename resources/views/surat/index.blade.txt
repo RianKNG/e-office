@@ -48,12 +48,10 @@
                    
                 </select>
             </div>
-           <!-- Ganti bagian nomor surat -->
-        <div class="col-md-6 mb-3">
-            <label class="form-label">Nomor Surat</label>
-            <input type="text" class="form-control" id="nomorSurat" name="nomor_surat" readonly placeholder="Akan di-generate otomatis">
-            <small class="form-text text-muted">Nomor surat akan di-generate otomatis berdasarkan jenis dan tanggal.</small>
-        </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Nomor Surat <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="nomorSurat" name="nomor_surat" >
+            </div>
         </div>
         
         <div class="row">
@@ -96,7 +94,7 @@
             <div class="col-md-6 mb-3">
                 <label class="form-label">Lampiran</label>
                 <!-- <input type="file" class="form-control" name="documen" placeholder="ds"> -->
-                <input type="file" class="form-control" name="berkas_surat" accept=".pdf,.doc,.docx,.xls,.jpeg,.xlsx" multiple>
+                <input type="file" class="form-control" name="berkas_surat[]" accept=".pdf,.doc,.docx,.xls,.jpeg,.xlsx" multiple>
                 <div class="form-text">
                     <small>Format yang didukung: PDF, DOC, DOCX, XLS, XLSX (max 5MB)</small>
                 </div>
@@ -151,7 +149,7 @@
             <textarea class="form-control" name="catatan_tambahan" rows="3" placeholder="Catatan tambahan (opsional)"></textarea>
         </div>
         <div class="form-group">
-                <label for="diterima_oleh">Penerima</label>
+                <label for="diterima_oleh">Klasifikasi Surat</label>
                 <select name="user_id" id="user_id" class="form-control">
                     <option value="">-- Pilih Penerima --</option>
                     @foreach ($coba as $item)
@@ -161,7 +159,33 @@
                     @endforeach
                 </select>
             </div>
+         <!-- <div class="col-md-12 mb-3">
+                  <label class="form-label">Klasifikasi Surat</label>
+                 <select id="user_id" name="user_id" class="form-control">
+              <option value="">--- User ---</option>
+              @foreach($coba as $item)
+              
+        <option value=2 @if (old('user_id') == "2") {{ 'selected' }} @endif>Male</option>
+        <option value=2 @if (old('user_id') == "3") {{ 'selected' }} @endif>Female</option>
+                  @endforeach  
+               
+            </select>
+
+
+
+            </div> -->
+        
+       <!-- <div class="col-md-6 mb-3">
+                <label class="form-label">file</label>
+                <input type="file" class="form-control" name="documen" placeholder="ds">
+            </div> -->
+        <!-- <form id="suratForm">
+    <input type="text" name="nama" placeholder="Nama">
+    <textarea name="alamat" placeholder="Alamat"></textarea> -->
+
     
+<!-- </form> -->
+
 <div id="previewBox">
     </div>
         <div class="d-flex gap-2 flex-wrap">

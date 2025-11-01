@@ -25,6 +25,7 @@
                                     <div class="row no-gutters align-items-center">
                                         <div class="col mr-2">
                                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                                
                                                 Nota Dinas</div>
                                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{$notdin}}</div>
                                         </div>
@@ -130,7 +131,7 @@
                                 <!-- Card Body -->
                                 <div class="card-body">
                                     <div class="chart-area">
-                                        <canvas id="myAreaChart"></canvas>
+                                        <canvas id="myChart"></canvas>
                                     </div>
                                 </div>
                             </div>
@@ -182,6 +183,43 @@
 
                 
 @endsection
+     
+@push('line')
+    
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const data = @json($data); // Mengubah data PHP ke format JSON
+        const labels = data.map(item => {
+            const monthNames = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+            return `${monthNames[item.month - 1]} ${item.year}`;
+        });
+        const counts = data.map(item => item.count);
+
+        const ctx = document.getElementById('myChart').getContext('2d');
+        const myChart = new Chart(ctx, {
+            type: 'bar', // atau 'line'
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Jumlah Data',
+                    data: counts,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>   
+    @endpush
+
                 
                 
                 

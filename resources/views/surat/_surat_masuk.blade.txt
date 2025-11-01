@@ -1,0 +1,113 @@
+
+@extends('layout.v_template')
+@section('title','surat')
+@section('bawah','Kelola Surat Masuk')
+@section('content')
+
+<!-- @endstack -->
+
+<!-- Begin Page Content -->
+                <div class="container-fluid">
+                    <!-- Button trigger modal -->
+                    <!-- DataTales Example -->
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Surat Masuk</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                               <table class="table table-bordered data-table-saya">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Name</th>
+                                             <th>Tempat Pembuatan</th>
+                                              <th>Jabatan Pembuat</th>
+                                            <th>Details</th>
+                                            <th width="280px">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                                 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.container-fluid -->
+                 
+            </div>
+            </div>
+            </div>
+            <!-- Button trigger modal -->
+
+
+<!-- Modal -->
+            @include('surat._add_modal')
+             @endsection
+             @push('masuk') 
+<script>
+           
+              $(document).ready(function() { //you can replace $ with Jquery
+              $.ajaxSetup({
+                                    headers: {
+                                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                    }
+                              });
+                              var table = $('.data-table-saya').DataTable({
+                                  processing: true,
+                                  serverSide: true,
+                                  ajax: "{{ route('surat.masuk') }}",
+                                  columns: [
+                                    { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
+                                    { data: 'nomor_surat', name: 'dn.nomor_surat' },
+                                    { data: 'berkas_surat', name: 'dn.berkas_surat' },
+                                    { data: 'tempat_pembuatan', name: 'dn.tempat_pembuatan' },
+                                    { data: 'jabatan_pembuat', name: 'dn.jabatan_pembuat' },
+                                    { data: 'aksi', name: 'aksi', orderable: false, searchable: false }
+                                    ]
+                                });
+                              
+
+              // disini ada ilmu bermanfaat-------------------------tambah sementara belum bikin-------------------------------------prefaundifol ternyata
+                $('.munculkan').on('click',function(e){
+                e.preventDefault();
+                $('#contohModal').modal('show');
+                      alert('cek ajak jalan apa kagak');
+                });
+              });
+
+             // disini ada ilmu bermanfaat-------------------------Edit Data-------------------------------------
+              $('body').on('click','.tombol-edit',function(e){
+              e.preventDefault();
+                var id = $(this).data('id');
+                //  console.log('hhhhh'+data);
+                // alert(coba);
+              $.ajax({
+                url: "/surat/edit/"+id,
+                type:'GET',
+                success:function(response){
+                $('#exampleModalLong').modal('show');
+                    $('#jS').val(response.result.jenis_surat);
+                    $('#nS').val(response.result.nomor_surat);
+                    $('#tS').val(response.result.tanggal_surat);
+                    $('#pH').val(response.result.perihal);
+                    $('#lT').val(response.result.letter_type);
+                    $('#iS').val(response.result.isi_surat);
+                    $('#bS').val(response.result.berkas_surat);
+                    $('#sS').val(response.result.sifat_surat);
+                    $('#kS').val(response.result.klsifikasi_surat);
+                    $('#dK').val(response.result.derajat_keamanan);
+                    $('#tP').val(response.result.tempat_pembuatan);
+                    $('#cT').val(response.result.catatan_tambahan);
+                    $('#kS').val(response.result.klsifikasi_surat);
+                                        // console.log(response.result);
+                  }
+                });
+              });
+                  
+ </script>
+ 
+
+    @endpush

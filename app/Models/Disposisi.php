@@ -1,32 +1,30 @@
 <?php
-
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Disposisi extends Model
 {
-     use HasFactory;
-    // protected $dateFormat='m-d-Y';
-    public $incrementing = false;
-    protected $guarded = [];
-    public $timestamps = false;
     protected $table = 'disposisi';
-    // Pastikan kolom yang dikirim dari form tercantum di sini
+    public $timestamps = false;
     protected $fillable = [
-        'nomor_disposisi', // <<< TAMBAHKAN INI
-        'id_surat_masuk', 
-         'dari_user', 
-        'kepada_user', 
-        'instruksi', 
-        'catatan', 
-        'batas_waktu', 
-        'prioritas', 
-        'status',
-        // tambahkan semua kolom lain yang Anda insert
+        'nomor_disposisi', 'id_surat_masuk', 'dari_user', 'kepada_user',
+        'id_disposisi_induk', 'instruksi', 'catatan', 'batas_waktu',
+        'prioritas', 'status', 'created_at'
     ];
-    
-    // ... properti lain
-  
+
+    public function surat()
+    {
+        return $this->belongsTo(Surat::class, 'id_surat_masuk');
+    }
+
+    public function dari()
+    {
+        return $this->belongsTo(User::class, 'dari_user');
+    }
+
+    public function kepada()
+    {
+        return $this->belongsTo(User::class, 'kepada_user');
+    }
 }

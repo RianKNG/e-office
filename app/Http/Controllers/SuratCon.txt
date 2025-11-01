@@ -2,23 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use Log;
-use Carbon\Carbon;
+use PDF;
 use App\Models\User;
 use App\Models\Surat;
 use Illuminate\Http\Request;
-use PhpOffice\PhpWord\PhpWord;
-use Barryvdh\DomPDF\Facade\Pdf;
-use PhpOffice\PhpWord\IOFactory;
 use Yajra\DataTables\Html\Column;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\HtmlString;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
-
+use Illuminate\Support\HtmlString;
 
 class SuratCon extends Controller
 {
@@ -85,54 +79,29 @@ class SuratCon extends Controller
      {
 
      }
-
+       
+ 
+   
+    
     public function store(Request $request)
     {
-        $request->validate([
-            'jenis_surat' => 'required|in:Surat Edaran,Surat Undangan,Surat Pengumuman,Surat Tugas,Surat Keputusan,Surat Pemberitahuan',
-            'tanggal_surat' => 'required|date',
-            'perihal' => 'required',
-            'isi_surat' => 'required',
+    
+   // dd($request->all());
+        $validator = Validator::make($request->all(), [
+            'berkas_surat' => 'required|mimes:jpeg,png,jpg,gif|max:2048', // Membatasi ke tipe gambar tertentu dan ukuran maks 2MB
         ]);
+       
 
-        // Ambil tanggal surat
-        $tanggalSurat = Carbon::parse($request->tanggal_surat);
-        $bulan = $tanggalSurat->format('m');
-        $tahun = $tanggalSurat->format('Y');
-
-        // Tentukan prefix
-       $map = [
-        'Surat Undangan' => 'SU',
-        'Surat Edaran'   => 'SE',
-        ];
-
-        $prefix = $map[$request->jenis_surat] ?? 'SM';
-
-        // Hitung nomor urut
-        $lastNumber = Surat::where('jenis_surat', $request->jenis_surat)
-            ->whereRaw('MONTH(tanggal_surat) = ?', [$bulan])
-            ->whereRaw('YEAR(tanggal_surat) = ?', [$tahun])
-            ->count();
-
-        $nomorUrut = str_pad($lastNumber + 1, 3, '0', STR_PAD_LEFT);
-        $nomorSurat = "{$prefix}/{$nomorUrut}/{$bulan}/{$tahun}";
-
-        // Simpan data
-        $data = $request->except('nomor_surat'); // abaikan input manual
-        $data['nomor_surat'] = $nomorSurat;
-
-        $surat = Surat::create($data);
-
-        // Simpan berkas
-        if ($request->file('berkas_surat')) {
-            $file = $request->file('berkas_surat');
-            $filename = $file->getClientOriginalName();
-            $file->move('lemari/', $filename);
-            $surat->berkas_surat = $filename;
-            $surat->save();
+        $data = Surat::create($request->all());
+        if($request->file('berkas_surat')){
+            $request->file('berkas_surat')->move('lemari/', $request->file('berkas_surat')->getClientOriginalName());
+            $data->berkas_surat=$request->file('berkas_surat')->getClientOriginalName();
+            $data->save();
         }
-
-        return redirect()->back()->with('success', 'Surat berhasil ditambahkan!');
+        
+       // Redirect ke halaman sebelumnya dengan flash message 'success'
+        return redirect()->back()->with('success', 'Produk berhasil ditambahkan!');
+   
     }
      public function getTemplate(Request $request)
     {
@@ -168,65 +137,5 @@ class SuratCon extends Controller
         // Mengembalikan tampilan pratinjau dalam bentuk HTML
         return view('surat._preview_template', compact('dataSurat'))->render();
     }
-     //downloadsuratPDF
-    public function downloadPdf($id)
-    {
-        try {
-        $surat = Surat::findOrFail($id);
-
-        // Pastikan view tersedia
-        if (!view()->exists('surat._pdf_template')) {
-            \Log::error('View surat._pdf_template');
-            return response()->json(['error' => 'Template PDF tidak tersedia.'], 500);
-        }
-
-        // Bersihkan nomor_surat dari karakter ilegal untuk nama file
-        $cleanNomor = preg_replace('/[\/:*?"<>|\\\\]/', '_', $surat->nomor_surat);
-        $fileName = 'Surat_' . Str::slug($cleanNomor, '_') . '.pdf';
-
-        $pdf = PDF::loadView('surat._pdf_template', compact('surat'));
-        return $pdf->download($fileName);
-
-    } catch (\Exception $e) {
-        \Log::error('Gagal download PDF: ' . $e->getMessage());
-        return back()->with('error', 'Gagal mengunduh PDF. Silakan coba lagi.');
-    }
-
-    }
-     //downloadsuratword
-    public function downloadWord($id)
-    {
-        $surat = Surat::findOrFail($id);
-
-        $phpWord = new PhpWord();
-        $section = $phpWord->addSection();
-
-        // Header
-        $section->addText("Nomor: {$surat->nomor_surat}", ['bold' => true, 'size' => 12]);
-        $section->addText("Perihal: {$surat->perihal}", ['bold' => true, 'size' => 12]);
-        $section->addTextBreak();
-
-        // Isi surat
-        $isi = str_replace("\n", "\n\n", $surat->isi_surat); // format paragraf
-        $section->addText($isi, ['name' => 'Times New Roman', 'size' => 12]);
-
-        // Footer
-        $section->addTextBreak(2);
-        $section->addText("{$surat->tempat_pembuatan}, " . \Carbon\Carbon::parse($surat->tanggal_surat)->format('d F Y'));
-        $section->addText($surat->jabatan_pembuat);
-
-        $filename = "Surat_{$surat->nomor_surat}.docx";
-        $tempFile = storage_path("app/temp/{$filename}");
-
-        // Pastikan folder ada
-        if (!is_dir(storage_path('app/temp'))) {
-            mkdir(storage_path('app/temp'), 0775, true);
-        }
-
-        $objWriter = IOFactory::createWriter($phpWord, 'Word2007');
-        $objWriter->save($tempFile);
-
-        return response()->download($tempFile)->deleteFileAfterSend(true);
-    }     
     
 }
