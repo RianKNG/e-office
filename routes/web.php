@@ -108,6 +108,7 @@ Route::post('/get-letter-template', [SuratCon::class, 'store'])->name('get.lette
 Route::get('/surat-masuk',[SuratCon::class,'tampil'])->name('surat.masuk');
 Route::get('/surat/download-pdf/{id}', [SuratCon::class, 'downloadPdf']);
 Route::get('/surat/download-word/{id}', [SuratCon::class, 'downloadWord']);
+Route::get('/surat/stream/{id}', [SuratCon::class, 'streamPdf']);
 
 
 

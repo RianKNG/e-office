@@ -227,6 +227,13 @@ class SuratCon extends Controller
         $objWriter->save($tempFile);
 
         return response()->download($tempFile)->deleteFileAfterSend(true);
-    }     
+    }
+    public function streamPdf($id)
+    {
+        $surat = Surat::findOrFail($id);
+        // dd($surat);
+        $pdf = Pdf::loadView('surat._pdf_template', compact('surat'));
+        return $pdf->stream('surat' . $surat->id . '.pdf');
+    }
     
 }

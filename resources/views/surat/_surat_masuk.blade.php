@@ -76,11 +76,13 @@ $.ajaxSetup({
      render: function(data, type, row) {
          let pdfIcon = `<a href="/surat/download-pdf/${row.id}" class="btn btn-sm btn-danger" title="Unduh PDF"><i class="fas fa-file-pdf"></i></a>`;
          let wordIcon = `<a href="/surat/download-word/${row.id}" class="btn btn-sm btn-primary" title="Unduh Word"><i class="fas fa-file-word"></i></a>`;
+         let streamIcon=`<a href="/surat/stream/${row.id}" class="btn btn-sm btn-success" target="_blank"><i class="fas fa-print"></i></a>`;
+         
 
          // Jika format_output disimpan di database, gunakan itu
          // Jika tidak, tampilkan keduanya
          return `
-             ${pdfIcon} ${wordIcon}
+             ${pdfIcon} ${wordIcon} ${streamIcon}
              <button class="tombol-edit btn btn-warning btn-sm" data-id="${row.id}">
    <i class="fas fa-edit"></i>
              </button>
