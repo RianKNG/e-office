@@ -1,77 +1,78 @@
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<!-- Modal -->
+<div class="modal fade" id="addModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Tambah Data Disposisi</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title">Tambah Nota Dinas</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            
-            <div class="modal-body">
-                <form action="/disposisi/add" method="POST" enctype="multipart/form-data" id="suratForm">
-                    @csrf 
-                    
-                    <input type="hidden" id="edit_id" name="id">
-                    <input type="hidden" id="id">
+            <form id="addItemForm" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-body">
+                    <div id="errorAlert" class="alert alert-danger d-none"></div>
 
+                    <!-- Nomor Nota -->
                     <div class="mb-3">
-                        <label for="add_nomor_disposisi" class="form-label">Nomor Disposisi</label>
-                        <input type="text" class="form-control" id="add_nomor_disposisi" name="nomor_disposisi" required>
+                        <label class="form-label">Nomor Nota</label>
+                        <input type="text" class="form-control" id="nomor_nota" name="nomor_nota" readonly placeholder="Akan di-generate otomatis">
+                        <div class="invalid-feedback" id="error_nomor_nota"></div>
+                        <small class="form-text text-muted">Nomor surat akan di-generate otomatis berdasarkan jenis dan tanggal.</small>
                     </div>
-                    
+
+                    <!-- Tanggal Nota -->
                     <div class="mb-3">
-                        <label for="add_id_surat_masuk" class="form-label">Surat Masuk</label>
-                        <input type="text" class="form-control" id="add_id_surat_masuk" name="id_surat_masuk" readonly>
+                        <label class="form-label">Tanggal Nota</label>
+                        <input type="date" class="form-control" id="tanggal_nota" name="tanggal_nota">
+                        <div class="invalid-feedback" id="error_tanggal_nota"></div>
                     </div>
+
+                    <!-- Perihal -->
                     <div class="mb-3">
-                        <label for="add_dari_user" class="form-label">Dari User</label>
-                        <input type="text" class="form-control" id="add_dari_user" name="dari_user" readonly>
+                        <label class="form-label">Perihal</label>
+                        <textarea class="form-control" id="perihal" name="perihal" rows="2"></textarea>
+                        <div class="invalid-feedback" id="error_perihal"></div>
                     </div>
+
+                    <!-- Isi Nota -->
                     <div class="mb-3">
-                        <label for="add_kepada_user" class="form-label">Kepada User</label>
-                        <input type="text" class="form-control" id="add_kepada_user" name="kepada_user" readonly>
+                        <label class="form-label">Isi Nota</label>
+                        <textarea class="form-control" id="isi_nota" name="isi_nota" rows="4"></textarea>
+                        <div class="invalid-feedback" id="error_isi_nota"></div>
                     </div>
-                    
+
+                    <!-- Lampiran -->
                     <div class="mb-3">
-                        <label for="add_instruksi" class="form-label">Instruksi</label>
-                        <input type="text" class="form-control" id="add_instruksi" name="instruksi">
+                        <label class="form-label">Lampiran (PDF/Image)</label>
+                        <input type="file" class="form-control" id="lampiran" name="lampiran" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                        <div class="invalid-feedback" id="error_lampiran"></div>
                     </div>
-                    
+
+                    <!-- Status -->
                     <div class="mb-3">
-                        <label for="add_catatan" class="form-label">Catatan</label>
-                        <textarea class="form-control" id="add_catatan" name="catatan" rows="4" required></textarea>
+                        <label class="form-label">Status</label>
+                        <input type="text" class="form-control" id="status" name="status">
+                        <div class="invalid-feedback" id="error_status"></div>
                     </div>
-                    
+
+                    <!-- Created By -->
                     <div class="mb-3">
-                        <label for="add_batas_waktu" class="form-label">Batas Waktu</label>
-                        <input type="date" class="form-control" id="add_batas_waktu" name="batas_waktu" required>
+                        <label class="form-label">Created By</label>
+                        <input type="text" class="form-control" id="created_by" name="created_by">
+                        <div class="invalid-feedback" id="error_created_by"></div>
                     </div>
-                    
+
+                    <!-- Approved By -->
                     <div class="mb-3">
-                        <label for="add_prioritas" class="form-label">Prioritas</label>
-                        <input type="text" class="form-control" id="add_prioritas" name="prioritas" required>
+                        <label class="form-label">Approved By</label>
+                        <input type="text" class="form-control" id="approved_by" name="approved_by">
+                        <div class="invalid-feedback" id="error_approved_by"></div>
                     </div>
-                    
-                    <div class="mb-3">
-                        <label for="add-status" class="form-label">Status</label>
-                        <input type="text" class="form-control" id="add-status" name="status" required>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="edit_created_by" class="form-label">Created By</label>
-                        <input type="text" class="form-control" id="edit_created_by" name="created_by" required>
-                    </div>
-                    
-                    </form>
-            </div>
-            
-            <div class="modal-footer">
-                
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                
-                <button type="button" class="btn btn-primary" onclick="addData()">Simpan Data</button>
-                
-            </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

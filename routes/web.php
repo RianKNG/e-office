@@ -13,7 +13,6 @@ use App\Http\Controllers\BackupController;
 use App\Http\Controllers\LetterController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\NotaDinasController;
 use App\Http\Controllers\DisposisiGabunganController;
 
 
@@ -35,8 +34,7 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::get('/home', [DashboardController::class, 'index']);
 
 Route::get('/allData', [NotaDinasCon::class, 'semua']);
-Route::post('/notadinas/addData', [NotaDinasCon::class,'addData']);
-Route::post('/notdin/update/status', [NotaDinasCon::class, 'updateStatus']);
+Route::post('/notadinas/store', [NotaDinasCon::class, 'store']); 
 Route::get('notadinas',[NotaDinasCon::class,'index'])->name('notadinas');
 Route::get('/fetchall', [NotaDinasCon::class, 'fetchAll'])->name('fetchAll');
 Route::delete('/delete', [NotaDinasCon::class, 'delete'])->name('delete');

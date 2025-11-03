@@ -385,47 +385,40 @@ $('#formDisposisi').on('submit', function(e) {
 });
 
 
-$('#addItemForm').on('submit', function(e) {
-    e.preventDefault();
-    let formData = new FormData(this);
-
-    $.ajax({
-        url: `/notadinas/store`,
-        method: 'POST',
-         formData,
-        processData: false,
-        contentType: false,
-        success: function(response) {
-            if (response.success) {
-                $('#addModal').modal('hide');
-                $('#addItemForm')[0].reset();
-                loadNotaDinasTable();
-                alert('Berhasil menambah nota dinas.');
-            }
-        },
-        error: function(xhr) {
-            if (xhr.status === 422) {
-                // Reset error lama
-                $('.invalid-feedback').text('');
-                $('.form-control').removeClass('is-invalid');
-
-                // Tampilkan error baru
-                const errors = xhr.responseJSON.errors;
-                for (const field in errors) {
-                    $(`#error_${field}`).text(errors[field][0]);
-                    $(`[name="${field}"]`).addClass('is-invalid');
-                }
-            } else {
-                alert('Terjadi kesalahan sistem.');
-            }
-        }
-    });
-});
-
     // Muat data saat halaman siap
     $(document).ready(function() {
         loadNotaDinasTable();
     });
+
+$(document).ready(function() {
+    $('#addItemForm').on('submit', function(e) {s
+        e.preventDefault();
+
+        $.ajax({
+    
+            url: "{{ route('notadinas.store') }}",
+            method: 'POST',
+            data: $(this).serialize(),
+            success: function(response) {
+                if (response.success) {
+                    location.reload(); // atau tambahkan baris baru tanpa reload
+                }
+            },
+            error: function(xhr) {
+                let errors = xhr.responseJSON?.errors;
+                let msg = '';
+                if (errors) {
+                    for (let field in errors) {
+                        msg += errors[field][0] + '<br>';
+                    }
+                } else {
+                    msg = 'Terjadi kesalahan sistem.';
+                }
+                $('#errorAlert').removeClass('d-none').html(msg);
+            }
+        });
+    });
+});
 </script>
 
 @endpush
