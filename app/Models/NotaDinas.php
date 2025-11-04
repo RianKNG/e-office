@@ -10,7 +10,7 @@ class NotaDinas extends Model
    
     use HasFactory;
     public $incrementing = false;
-    protected $guarded = [];
+    // protected $guarded = [];
      protected $fillable = [
     'nomor_nota',
     'tanggal_nota',

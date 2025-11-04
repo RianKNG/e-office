@@ -49,7 +49,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 // Route::delete('admin/users/{id}', [UserController::class, 'destroy'])->name('admin.users.destroy');
 
 Route::get('/allData', [NotaDinasCon::class, 'semua']);
-Route::post('/notadinas/addData', [NotaDinasCon::class,'addData']);
+// Route::post('/notadinas/addData', [NotaDinasCon::class,'addData']);
 Route::post('/notdin/update/status', [NotaDinasCon::class, 'updateStatus']);
 Route::get('notadinas',[NotaDinasCon::class,'index'])->name('notadinas');
 Route::get('/fetchall', [NotaDinasCon::class, 'fetchAll'])->name('fetchAll');
@@ -58,6 +58,7 @@ Route::get('/notadinas/edit/{id}', [NotaDinasCon::class, 'edit']);
 Route::post('/notadinas/update/{id}', [NotaDinasCon::class, 'update']);
 Route::post('/notadinas/disposisi/{id}', [NotaDinasCon::class, 'storeDisposisi']);
 Route::get('/notadinas/disposisi/{id}', [NotaDinasCon::class, 'getDisposisi']);
+Route::post('/notadinas/store', [NotaDinasCon::class, 'store']);
 // routes/web.php
 Route::get('/disposisi', [DisposisiCon::class, 'index'])->name('disposisi.index');
 Route::get('/api/disposisi/sumber', [DisposisiCon::class, 'listSumberDisposisi'])->name('disposisi.sumber');
