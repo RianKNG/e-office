@@ -14,6 +14,7 @@ use App\Http\Controllers\LetterController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DisposisiGabunganController;
+use App\Http\Controllers\Admin\UserController;
 
 
 /*
@@ -27,14 +28,29 @@ use App\Http\Controllers\DisposisiGabunganController;
 |
 */
 
+
+
 //userlogin
 Route::get('/', function () { return view('auth.login'); })->name('login');
 Route::post('/', [LoginController::class, 'authenticate']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::get('/home', [DashboardController::class, 'index']);
 
+Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+    Route::resource('users', App\Http\Controllers\Admin\UserController::class);
+});
+
+
+// Route::get('admin/users', [UserController::class, 'index']);
+// Route::get('admin/users/create', [UserController::class, 'create'])->name('admin.users.create');
+// Route::post('admin/users', [UserController::class, 'store'])->name('admin.users.store');
+// Route::get('admin/users/{id}/edit', [UserController::class, 'edit'])->name('admin.users.edit');
+// Route::put('admin/users/{id}', [UserController::class, 'update'])->name('admin.users.update');
+// Route::delete('admin/users/{id}', [UserController::class, 'destroy'])->name('admin.users.destroy');
+
 Route::get('/allData', [NotaDinasCon::class, 'semua']);
-Route::post('/notadinas/store', [NotaDinasCon::class, 'store']); 
+Route::post('/notadinas/addData', [NotaDinasCon::class,'addData']);
+Route::post('/notdin/update/status', [NotaDinasCon::class, 'updateStatus']);
 Route::get('notadinas',[NotaDinasCon::class,'index'])->name('notadinas');
 Route::get('/fetchall', [NotaDinasCon::class, 'fetchAll'])->name('fetchAll');
 Route::delete('/delete', [NotaDinasCon::class, 'delete'])->name('delete');

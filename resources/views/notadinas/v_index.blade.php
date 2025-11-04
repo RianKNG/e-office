@@ -11,9 +11,9 @@
             
             <h6 class="m-0 font-weight-bold text-primary">Tabel Nota Dinas</h6>
             
-                <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addModal">
-        Tambah Item
-    </button>
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+                Tambah Data
+            </button>
         </div>
                         <div class="card-body">
                             <div class="table-responsive">
@@ -29,10 +29,10 @@
                                                 <!-- <th>isi_nota </th> -->
                                                 <th>lampiran </th>
                                                 <!-- <th>status </th> -->
-                                                <th>Dibuat</th>
-                                                <th>Kepada</th>
-                                                <th>Disetujui</th>
-                                                <th>Waktu</th>
+                                                <th>created_by </th>
+                                                <th>approved_by </th>
+                                                <th>approved_at </th>
+                                                <th>created_at</th>
                                                 <!-- <th>persetujuan</th> -->
                                                 <th>Aksi</th>
                                             
@@ -135,7 +135,7 @@
                                 <td>${value.nama}</td>
                                 <td>${value.nama}</td>
                                 <td>${value.created_at}</td>
-                                
+                               
                                  <td>
                                    <button class='btn btn-primary btn-xm' data-toggle='modal' data-target='#editModal' onclick='editData("${value.id}")'><i class="fas fa-edit"></i></button>
                                   <button class='btn btn-info btn-xm' onclick='openDisposisiModal("${value.id}")'>
@@ -340,7 +340,6 @@ function editData(id) {
         }
     });
 }
- 
 
 function openDisposisiModal(id) {
     $('#nota_id').val(id);
@@ -383,49 +382,35 @@ $('#formDisposisi').on('submit', function(e) {
         }
     });
 });
+// function loadDisposisi(id) {
+//     $.ajax({
+//           url: `/notadinas/disposisi/${id}`,
+//         // url: `/notadinas/${id}/disposisi`,
+//         method: 'GET',
+//         success: function(data) {
+//             let html = '';
+//             $.each(data, function(index, d) {
+//                 html += `
+//                     <tr>
+//                         <td>${index + 1}</td>
+//                         <td>${d.tujuan_disposisi}</td>
+//                         <td>${d.isi_disposisi}</td>
+//                         <td>${d.nama_user || '-'}</td>
+//                         <td>${d.created_at}</td>
+//                     </tr>
+//                 `;
+//             });
+//             $('#tabelDisposisi tbody').html(html);
+//         }
+//     });
+// }
 
-
-$('#addItemForm').on('submit', function(e) {
-    e.preventDefault();
-    let formData = new FormData(this);
-
-    $.ajax({
-        url: `/notadinas/store`,
-        method: 'POST',
-         formData,
-        processData: false,
-        contentType: false,
-        success: function(response) {
-            if (response.success) {
-                $('#addModal').modal('hide');
-                $('#addItemForm')[0].reset();
-                loadNotaDinasTable();
-                alert('Berhasil menambah nota dinas.');
-            }
-        },
-        error: function(xhr) {
-            if (xhr.status === 422) {
-                // Reset error lama
-                $('.invalid-feedback').text('');
-                $('.form-control').removeClass('is-invalid');
-
-                // Tampilkan error baru
-                const errors = xhr.responseJSON.errors;
-                for (const field in errors) {
-                    $(`#error_${field}`).text(errors[field][0]);
-                    $(`[name="${field}"]`).addClass('is-invalid');
-                }
-            } else {
-                alert('Terjadi kesalahan sistem.');
-            }
-        }
-    });
-});
 
     // Muat data saat halaman siap
     $(document).ready(function() {
         loadNotaDinasTable();
     });
 </script>
+
 
 @endpush

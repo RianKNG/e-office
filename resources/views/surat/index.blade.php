@@ -82,16 +82,7 @@
                 <small>Tip: Gunakan format surat yang baku dan jelas</small>
             </div>
         </div>
-          <div class="form-group">
-                        <label for="letter_type_selector">Jenis Surat:</label>
-                        <select class="form-control" id="letter_type_selector" name="letter_type">
-                            <option value="">-- Pilih Jenis Surat --</option>
-                            <option value="undangan_rapat">Undangan Rapat</option>
-                            <option value="permohonan_izin">Permohonan Izin</option>
-                            <option value="pemberitahuan">Pemberitahuan</option>
-                            <option value="lain-lain">Lain-lain</option>
-                        </select>
-                    </div>
+          
         <div class="row">
             <div class="col-md-6 mb-3">
                 <label class="form-label">Lampiran</label>
@@ -161,7 +152,16 @@
                     @endforeach
                 </select>
             </div>
-    
+    <div class="form-group">
+                        <label for="letter_type_selector">Template Surat Surat:</label>
+                        <select class="form-control" id="letter_type_selector" name="letter_type">
+                            <option value="">-- Pilih Template Surat --</option>
+                            <option value="undangan_rapat">Undangan Rapat</option>
+                            <option value="permohonan_izin">Permohonan Izin</option>
+                            <option value="pemberitahuan">Pemberitahuan</option>
+                            <option value="lain-lain">Lain-lain</option>
+                        </select>
+                    </div>
 <div id="previewBox">
     </div>
         <div class="d-flex gap-2 flex-wrap">
@@ -171,14 +171,17 @@
             <button type="button" id="tombol_preview" class="btn btn-warning d-flex gap-2 flex-wrap">
                 Lihat Pratinjau Surat
             </button>
-            <!-- <button type="button" class="btn btn-outline-secondary" onclick="loadTemplate()">
-                <i class="bi bi-file-earmark-text"></i> Load Template
-            </button> -->
+            <!-- Tombol Buka Modal -->
+              <!-- <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#templateSuratModalDua">
+        Pilih Template Surat
+    </button>
+     -->
             <button type="reset" class="btn btn-outline-danger">
                 <i class="bi bi-arrow-clockwise"></i> Reset
             </button>
         </div>
     </form>
+    
      <!-- <div class="preview-area">
             <h1>Pratinjau Surat</h1>
             <div id="previewBox" class="preview-box">
@@ -187,9 +190,9 @@
             </div>
         </div>
 </div> -->
-
+@include('surat.modal-template-surat')
 <!-- Template Modal -->
-<div class="modal fade" id="templateModal" tabindex="-1">
+<!-- <div class="modal fade" id="templateModalDua" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -238,10 +241,10 @@
             </div>
         </div>
     </div>
-</div>
+</div> -->
 
 <!-- Preview Modal -->
-<div class="modal fade" id="previewModal" tabindex="-1">
+<!-- <div class="modal fade" id="previewModal" tabindex="-1">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
@@ -261,7 +264,8 @@
             </div>
         </div>
     </div>
-</div>
+<!-- </div> --> 
+
 
 
 
