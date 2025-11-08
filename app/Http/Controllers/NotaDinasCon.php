@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
+
 class NotaDinasCon extends Controller
 {
     public function index()
@@ -152,20 +153,75 @@ class NotaDinasCon extends Controller
 
         return response()->json($data);
     }
-    public function store(Request $request)
+//     public function store(Request $request)
+// {
+//     $request->validate([
+//         'tanggal_nota' => 'required|date',
+//         'perihal'      => 'required|string|max:255',
+//         'isi_nota'     => 'required|string',
+//           'lampiran'     => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:10240',
+//         'status'       => 'required|string',
+//         'created_by'   => 'nullable|integer',
+//         'approved_by'  => 'nullable|integer',
+      
+//     ]);
+
+//     $tanggalNota = Carbon::parse($request->tanggal_nota);
+//     $bulan = $tanggalNota->format('m');
+//     $tahun = $tanggalNota->format('Y');
+//     $prefix = 'ND';
+
+//     $lastNumber = NotaDinas::whereMonth('tanggal_nota', $bulan)
+//         ->whereYear('tanggal_nota', $tahun)
+//         ->count();
+
+//     $nomorUrut = str_pad($lastNumber + 1, 3, '0', STR_PAD_LEFT);
+//     $nomorNota = "{$prefix}/{$nomorUrut}/{$bulan}/{$tahun}";
+
+//     // Simpan data dasar
+//     $notadinas = NotaDinas::create([
+//         'nomor_nota'   => $nomorNota,
+//         'tanggal_nota' => $request->tanggal_nota,
+//         'perihal'      => $request->perihal,
+//         'isi_nota'     => $request->isi_nota,
+//         'status'       => $request->status,
+//         'created_by'   => $request->created_by,
+//         'approved_by'  => $request->approved_by,
+//         'lampiran'     => $request->lampiran,
+//     ]);
+
+
+//      if ($request->hasFile('lampiran')) {
+//         $file = $request->file('lampiran');
+//         $filename = time() . '_' . $file->getClientOriginalName(); // tambah timestamp agar unik
+//         $file->move(public_path('lemari'), $filename); // ✅ gunakan public_path()
+//         $notadinas->lampiran = $filename;
+//            $notadinas->update(['lampiran' => $filename]); // ✅ gunakan update()
+//         }
+//     // Jika ada file, update
+//     // if ($request->hasFile('lampiran')) {
+//     //     $file = $request->file('lampiran');
+//     //     $filename = time() . '_' . $file->getClientOriginalName();
+//     //     $file->move(public_path('lemari'), $filename);
+//     //     $notadinas->update(['lampiran' => $filename]); // ✅ gunakan update()
+//     // }
+
+//     return response()->json(['success' => true, 'message' => 'Nota dinas berhasil disimpan.']);
+// }
+// }
+ public function store(Request $request)
 {
     $request->validate([
+        // 'nomor_nota'   => 'required|string|max:50',
         'tanggal_nota' => 'required|date',
-        'perihal'      => 'required|string|max:255',
+        'perihal'      => 'required|string',
         'isi_nota'     => 'required|string',
-          'lampiran'     => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:10240',
-        'status'       => 'required|string',
-        'created_by'   => 'nullable|integer',
-        'approved_by'  => 'nullable|integer',
-      
+        'lampiran' => 'nullable|file|max:10240', // max 10MB
+        'status'       => 'nullable|string',
+        'created_by'   => 'required|integer',
+        'approved_by'  => 'required|integer',
     ]);
-
-    $tanggalNota = Carbon::parse($request->tanggal_nota);
+        $tanggalNota = Carbon::parse($request->tanggal_nota);
     $bulan = $tanggalNota->format('m');
     $tahun = $tanggalNota->format('Y');
     $prefix = 'ND';
@@ -177,36 +233,41 @@ class NotaDinasCon extends Controller
     $nomorUrut = str_pad($lastNumber + 1, 3, '0', STR_PAD_LEFT);
     $nomorNota = "{$prefix}/{$nomorUrut}/{$bulan}/{$tahun}";
 
-    // Simpan data dasar
-    $notadinas = NotaDinas::create([
-        'nomor_nota'   => $nomorNota,
-        'tanggal_nota' => $request->tanggal_nota,
-        'perihal'      => $request->perihal,
-        'isi_nota'     => $request->isi_nota,
-        'status'       => $request->status,
-        'created_by'   => $request->created_by,
-        'approved_by'  => $request->approved_by,
-        'lampiran'     => $request->lampiran,
-    ]);
 
+    try {
+        $lampiranPath = null;
 
-     if ($request->hasFile('lampiran')) {
-        $file = $request->file('lampiran');
-        $filename = time() . '_' . $file->getClientOriginalName(); // tambah timestamp agar unik
-        $file->move(public_path('lemari'), $filename); // ✅ gunakan public_path()
-        $notadinas->lampiran = $filename;
-           $notadinas->update(['lampiran' => $filename]); // ✅ gunakan update()
+        if ($request->hasFile('lampiran') && $request->file('lampiran')->isValid()) {
+            // Simpan file ke folder public/lampiran/
+            $lampiranPath = $request->file('lampiran')->storeAs(
+                'lampiran', // folder tujuan
+                time() . '_' . $request->file('lampiran')->getClientOriginalName(), // nama unik
+                'public' // disk
+            );
         }
-    // Jika ada file, update
-    // if ($request->hasFile('lampiran')) {
-    //     $file = $request->file('lampiran');
-    //     $filename = time() . '_' . $file->getClientOriginalName();
-    //     $file->move(public_path('lemari'), $filename);
-    //     $notadinas->update(['lampiran' => $filename]); // ✅ gunakan update()
-    // }
 
-    return response()->json(['success' => true, 'message' => 'Nota dinas berhasil disimpan.']);
+        $nota = NotaDinas::create([
+          'nomor_nota'   => $nomorNota,
+            'tanggal_nota' => $request->tanggal_nota,
+            'perihal'      => $request->perihal,
+            'isi_nota'     => $request->isi_nota,
+            'lampiran'     => $lampiranPath, // simpan nama file, bukan path sementara!
+            'status'       => $request->status,
+            'created_by'   => $request->created_by,
+            'approved_by'  => $request->approved_by,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Nota dinas berhasil disimpan.',
+            'data'    => $nota
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Terjadi kesalahan saat menyimpan: ' . $e->getMessage()
+        ], 500);
+    }
 }
-}
-    
+}   
 
