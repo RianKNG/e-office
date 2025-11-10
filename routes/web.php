@@ -34,19 +34,18 @@ use App\Http\Controllers\Admin\UserController;
 Route::get('/', function () { return view('auth.login'); })->name('login');
 Route::post('/', [LoginController::class, 'authenticate']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
-Route::get('/home', [DashboardController::class, 'index']);
-
-Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
-    Route::resource('users', App\Http\Controllers\Admin\UserController::class);
-});
+// ✅ Lindungi halaman /home
+Route::get('/home', [DashboardController::class, 'index'])->middleware('auth');
 
 
-// Route::get('admin/users', [UserController::class, 'index']);
-// Route::get('admin/users/create', [UserController::class, 'create'])->name('admin.users.create');
-// Route::post('admin/users', [UserController::class, 'store'])->name('admin.users.store');
-// Route::get('admin/users/{id}/edit', [UserController::class, 'edit'])->name('admin.users.edit');
-// Route::put('admin/users/{id}', [UserController::class, 'update'])->name('admin.users.update');
-// Route::delete('admin/users/{id}', [UserController::class, 'destroy'])->name('admin.users.destroy');
+
+
+Route::get('admin/users', [UserController::class, 'index'])->middleware(['auth','must-admin']);
+Route::get('admin/users/create', [UserController::class, 'create'])->name('admin.users.create');
+Route::post('admin/users', [UserController::class, 'store'])->name('admin.users.store');
+Route::get('admin/users/{id}/edit', [UserController::class, 'edit'])->name('admin.users.edit');
+Route::put('admin/users/{id}', [UserController::class, 'update'])->name('admin.users.update');
+Route::delete('admin/users/{id}', [UserController::class, 'destroy'])->name('admin.users.destroy');
 
 Route::get('/allData', [NotaDinasCon::class, 'semua']);
 // Route::post('/notadinas/addData', [NotaDinasCon::class,'addData']);
@@ -58,7 +57,7 @@ Route::get('/notadinas/edit/{id}', [NotaDinasCon::class, 'edit']);
 Route::post('/notadinas/update/{id}', [NotaDinasCon::class, 'update']);
 Route::post('/notadinas/disposisi/{id}', [NotaDinasCon::class, 'storeDisposisi']);
 Route::get('/notadinas/disposisi/{id}', [NotaDinasCon::class, 'getDisposisi']);
-Route::post('/notadinas/store', [NotaDinasCon::class, 'store']);
+Route::post('/notadinas/store', [NotaDinasCon::class, 'store'])->middleware(['auth','must-admin']);
 // routes/web.php
 Route::get('/disposisi', [DisposisiCon::class, 'index'])->name('disposisi.index');
 Route::get('/api/disposisi/sumber', [DisposisiCon::class, 'listSumberDisposisi'])->name('disposisi.sumber');

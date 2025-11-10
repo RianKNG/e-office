@@ -140,12 +140,16 @@
                     <span>Pengaturan</span>
                 </a>
             </li>
-            <!-- Nav Item - Tables -->
-            <!-- <li class="nav-item">
-                <a class="nav-link" href="tables.html">
-                    <i class="fas fa-fw fa-table"></i>
-                    <span>Tables</span></a>
-            </li> -->
+             @if(in_array(Auth::user()->role, ['admin', 'administrator']))
+       <li class="nav-item">
+                <a class="nav-link" href="admin/users">
+                    <!-- aria-controls="collapsePages"> -->
+                    <i class="fas fa-fw fa-folder"></i>
+                    <span>PP</span>
+                </a>
+            </li>
+    @endif
+            
 
             <!-- Divider -->
             <hr class="sidebar-divider d-none d-md-block">

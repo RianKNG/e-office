@@ -13,8 +13,11 @@ class DashboardController extends Controller
 {
      public function index()
     {
+//   dd(Auth::check(), Auth::user());
+//    $inisial=Auth::user()->nama_lengkap;
+//    dd($inisial);
 
-        
+    // dd('Anda sudah login sebagai: ' . Auth::user()->name);
         // Ambil data dari model, misalnya 5 posting terbaru
         $surat = DB::table('surat_masuk')->count();
         $notdin = DB::table('nota_dinas')->count();

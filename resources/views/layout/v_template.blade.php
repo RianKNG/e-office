@@ -116,13 +116,13 @@
 <li class="nav-item dropdown no-arrow">
     <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          <span class="dropdown-item">Wilujeng Sumping, {{ session('user_name') }}</span> 
+          <span class="dropdown-item">Wilujeng Sumpmmmmmmming, {{ Auth::user()->nama_lengkap }}</span> 
         <img class="img-profile rounded-circle" src="{{ asset('template/img/undraw_profile.svg') }}" alt="User Profile">
     </a>
    
     <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
         <div class="dropdown-divider"></div>
-        <span class="dropdown-item">Welcome, {{ session('user_name') }}</span> 
+        <span class="dropdown-item">Welcome, {{ Auth::user()->nama_lengkap }}</span> 
         <div class="dropdown-divider"></div>
         <a class="dropdown-item" href="logout" data-toggle="modal" data-target="#logoutModal">
             <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i> Logout

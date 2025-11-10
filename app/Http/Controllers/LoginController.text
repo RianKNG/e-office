@@ -3,17 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Auth; // ✅ Tambahkan ini
-use App\Models\User;
 
 class LoginController extends Controller
 {
-    public function showLoginForm()
-    {
-        return view('auth.login');
-    }
-
     public function authenticate(Request $request)
     {
         $request->validate([
@@ -21,7 +15,8 @@ class LoginController extends Controller
             'password' => 'required',
         ]);
 
-        $user = User::where('username', $request->username)->first();
+        // Cari user berdasarkan username
+        $user = \App\Models\User::where('username', $request->username)->first();
 
         if (!$user) {
             return back()->withErrors(['username' => 'Username tidak ditemukan.']);
@@ -31,22 +26,17 @@ class LoginController extends Controller
             return back()->withErrors(['username' => 'Akun tidak aktif.']);
         }
 
+        // Verifikasi password
         if (!Hash::check($request->password, $user->password)) {
             return back()->withErrors(['password' => 'Password salah.']);
         }
 
-        // ✅ GUNAKAN AUTH::LOGIN() — ini akan mengatur session secara otomatis
-        Auth::login($user); // Laravel akan kelola session & guard
+        // 🔑 LOGIN DENGAN LARAVEL AUTH (ini yang membuat auth() berfungsi)
+        Auth::login($user, $request->boolean('remember'));
 
-        return redirect('/home');
-    }
+        // Regenerasi session untuk keamanan
+        $request->session()->regenerate();
 
-    // Tambahkan method logout yang benar
-    public function logout(Request $request)
-    {
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-        return redirect('/');
+        return redirect()->intended('/home');
     }
 }
