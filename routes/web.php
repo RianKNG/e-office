@@ -39,7 +39,7 @@ Route::get('/home', [DashboardController::class, 'index'])->middleware('auth');
 
 
 
-
+//Coba
 Route::get('admin/users', [UserController::class, 'index'])->middleware(['auth','must-admin']);
 Route::get('admin/users/create', [UserController::class, 'create'])->name('admin.users.create');
 Route::post('admin/users', [UserController::class, 'store'])->name('admin.users.store');
