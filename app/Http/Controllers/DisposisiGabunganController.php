@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Disposisi;
-use App\Models\DisposisiNota;
-use app\models\NotaDinas;
 use App\Models\User;
+use App\Models\Disposisi;
+use app\models\NotaDinas;
+use Illuminate\Http\Request;
+use App\Models\DisposisiNota;
+use Illuminate\Support\Facades\Auth;
+
+use Illuminate\Support\Facades\DB; // Mungkin diperlukan jika Anda menggunakan transaksi
 
 class DisposisiGabunganController extends Controller
 {
@@ -16,10 +19,11 @@ class DisposisiGabunganController extends Controller
     public function index()
     {
         // Pastikan user sudah login
-        $userId = session('user_id');
-        if (!$userId) {
-            return redirect()->route('login')->withErrors(['Silakan login terlebih dahulu.']);
-        }
+        // $userId = session('user_id');
+        // if (!$userId) {
+        //     return redirect()->route('login')->withErrors(['Silakan login terlebih dahulu.']);
+        // }
+         $userId = Auth::id();
 
         // === Ambil Disposisi Surat Masuk ===
         $suratDisposisi = Disposisi::with(['surat', 'dari', 'kepada'])
@@ -174,5 +178,70 @@ class DisposisiGabunganController extends Controller
         ]));
 
         return response()->json(['success' => true]);
+    }
+
+
+
+    // app/Http/Controllers/DisposisiGabunganController.php
+
+
+
+
+    // ... (metode showDetail dan lainnya yang sudah Anda miliki) ...
+
+    /**
+     * Menghapus data disposisi berdasarkan jenis dan ID.
+     * Menggunakan find() daripada findOrFail() untuk menangani kasus data tidak ditemukan.
+     */
+
+    public function destroy($jenis, $id)
+    {
+        DB::beginTransaction();
+
+        try {
+            $message = '';
+            $deletedItem = null;
+
+            if ($jenis === 'surat') {
+                $deletedItem = Disposisi::find($id); // Menggunakan find()
+            } elseif ($jenis === 'nota') {
+                $deletedItem = DisposisiNota::find($id); // Menggunakan find()
+            } else {
+                DB::rollBack();
+                return response()->json(['message' => 'Jenis disposisi tidak valid.'], 400);
+            }
+
+            if ($deletedItem) {
+                // Jika model Anda menggunakan SoftDeletes, gunakan forceDelete() untuk hapus permanen
+                // $deletedItem->forceDelete(); 
+                
+                // Gunakan delete() untuk hapus normal atau soft delete
+                $deletedItem->delete();
+                $message = ucfirst($jenis) . ' ID ' . $id . ' berhasil dihapus.';
+            } else {
+                $message = ucfirst($jenis) . ' ID ' . $id . ' tidak ditemukan di database.';
+            }
+
+            DB::commit(); 
+
+            return response()->json([
+                'success' => true,
+                'message' => $message
+            ], 200);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            // Log error yang sebenarnya untuk debugging internal
+            Log::error('Error saat menghapus disposisi: ' . $e->getMessage());
+
+            // Pesan error yang lebih ramah pengguna untuk frontend
+            $errorMessage = 'Gagal menghapus disposisi karena kesalahan server atau data terkait (foreign key constraint).';
+
+            return response()->json([
+                'success' => false,
+                'message' => $errorMessage
+            ], 500);
+        }
     }
 }

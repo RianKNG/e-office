@@ -1,24 +1,44 @@
-<!-- Modal -->
-<div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
-  <div class="modal-dialog" role="document">
+<div class="modal fade" id="editModal" tabindex="-1">
+  <div class="modal-dialog">
     <div class="modal-content">
+      
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
+        <h5 class="modal-title">Edit Surat</h5>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
       </div>
-      <div class="modal-body">
-       <div class="forn-group">
-              <label for="">Kode</label>
-              <input type="text" class="form-control" id="kodeU" placeholde="masukan Kode Wilayah">
-              <span class="text-danger" id="kodeErrorU"></span>
-          </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
-      </div>
+
+      <form id="formEditSurat">
+        <div class="modal-body">
+            
+            <input type="hidden" id="edit_id" name="id">
+
+            <div class="form-group">
+              <label>Nomor Surat</label>
+              <input type="text" id="edit_nomor_surat" name="nomor_surat" class="form-control">
+            </div>
+
+            <div class="form-group">
+              <label>Perihal</label>
+              <input type="text" id="edit_perihal" name="perihal" class="form-control">
+            </div>
+
+            <div class="form-group">
+              <label>Tempat Pembuatan</label>
+              <input type="text" id="edit_tempat" name="tempat_pembuatan" class="form-control">
+            </div>
+
+            <div class="form-group">
+              <label>Jabatan Pembuat</label>
+              <input type="text" id="edit_jabatan" name="jabatan_pembuat" class="form-control">
+            </div>
+
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Simpan</button>
+        </div>
+      </form>
+
     </div>
   </div>
 </div>

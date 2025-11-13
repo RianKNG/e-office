@@ -116,13 +116,13 @@
 <li class="nav-item dropdown no-arrow">
     <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          <span class="dropdown-item">Wilujeng Sumpmmmmmmming, {{ Auth::user()->nama_lengkap }}</span> 
+          <span class="dropdown-item">Wilujeng Sumping, {{ Auth::user()->nama_lengkap }}</span> 
         <img class="img-profile rounded-circle" src="{{ asset('template/img/undraw_profile.svg') }}" alt="User Profile">
     </a>
    
     <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
         <div class="dropdown-divider"></div>
-        <span class="dropdown-item">Welcome, {{ Auth::user()->nama_lengkap }}</span> 
+        <span class="dropdown-item">Wilujeng Uih, {{ Auth::user()->nama_lengkap }}</span> 
         <div class="dropdown-divider"></div>
         <a class="dropdown-item" href="logout" data-toggle="modal" data-target="#logoutModal">
             <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i> Logout
@@ -211,6 +211,7 @@
      
     <script src="https://cdn.datatables.net/2.3.4/js/dataTables.min.js"></script>
      <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
+     
      @stack('scripts')
     @stack('masuk')
     @stack('surat')

@@ -127,6 +127,24 @@
                                                 data-jenis="{{ $item['jenis'] }}">
                                             <i class="fas fa-edit"></i>
                                         </button>
+                                        <!-- Contoh untuk menghapus surat ID 5 -->
+<!-- <button class="btn btn-danger delete-btn" data-id="{{ $item['id'] }}" data-jenis="surat" id="xcxc">Hapus Surat</button> -->
+
+<!-- Contoh untuk menghapus nota ID 10 -->
+
+            @php
+             
+                $buttonLabel = ($item['jenis'] === 'surat') ? 'Hapus Surat' : 'Hapus Nota';
+            @endphp
+            
+            <button 
+                class="btn btn-danger delete-btn" id="xcxc"
+                data-id="{{ $item['id'] }}" 
+                data-jenis="{{ $item['jenis'] }}"
+            >
+                {{ $buttonLabel }}
+            </button>
+<!-- <button class="btn btn-danger delete-btn" data-id="{{ $item['id'] }}" data-jenis="nota" id="xcxc">Hapus Nota</button> -->
                                     </td>
                                 </tr>
                                 @endforeach
@@ -403,6 +421,48 @@ $(document).ready(function () {
         });
     });
 });
+ $('body').on('click', '.delete-btn', function(e) {
+        e.preventDefault();
+        
+        var id = $(this).data('id');
+        var jenis = $(this).data('jenis'); 
+
+        if (!id || !jenis) { 
+            alert('ID atau Jenis tidak ditemukan pada elemen HTML.'); 
+            return; 
+        }
+        
+        // Konfirmasi sebelum menghapus
+        if (!confirm('Apakah Anda yakin ingin menghapus data ' + jenis + ' ID ' + id + '?')) {
+            return;
+        }
+
+        var deleteUrl = '/disposisi/' + jenis + '/' + id;
+         
+        $.ajax({
+            url: deleteUrl,
+            type: 'DELETE', // Method DELETE
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') 
+            },
+            success: function(res) {
+                // Tampilkan alert sukses dan refresh halaman
+                alert('Sukses: ' + res.message);
+                window.location.reload(); // Refresh halaman setelah sukses
+            },
+            error: function(xhr) {
+                // Tampilkan alert error
+                var errorMessage = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Terjadi kesalahan saat menghapus.';
+                alert('Error: ' + errorMessage);
+            }
+        });
+    });
+
+
+
+
+
+ // end ready
 </script>
 
 

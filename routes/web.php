@@ -60,7 +60,9 @@ Route::get('/notadinas/disposisi/{id}', [NotaDinasCon::class, 'getDisposisi']);
 Route::post('/notadinas/store', [NotaDinasCon::class, 'store'])->middleware(['auth','must-admin']);
 // routes/web.php
 Route::get('/disposisi', [DisposisiCon::class, 'index'])->name('disposisi.index');
-Route::get('/api/disposisi/sumber', [DisposisiCon::class, 'listSumberDisposisi'])->name('disposisi.sumber');
+
+
+Route::delete('/disposisi/{jenis}/{id}', [DisposisiGabunganController::class, 'destroy'])->name('disposisi.destroy');
 
 
 
@@ -74,7 +76,7 @@ Route::prefix('laporan')->group(function () {
     Route::get('/',[LaporanController::class,'laporan'])->name('laporan');
 });
 
-Route::get('/disposisi/{jenis}/{id}/edit', [DisposisiGabunganController::class, 'showEditForm']);
+Route::get('/disposisi/{jenis}/{id}/edit', [DisposisiGabunganController::class, 'showEditForm'])->middleware(['auth','must-admin']);;
 Route::put('/disposisi/{jenis}/{id}', [DisposisiGabunganController::class, 'update']);
 Route::get('/disposisi', [DisposisiGabunganController::class, 'index'])->name('disposisi.index');
 Route::get('/disposisi/{jenis}/{id}/detail', function ($jenis, $id) {
@@ -123,6 +125,8 @@ Route::get('/surat-masuk',[SuratCon::class,'tampil'])->name('surat.masuk');
 Route::get('/surat/download-pdf/{id}', [SuratCon::class, 'downloadPdf']);
 Route::get('/surat/download-word/{id}', [SuratCon::class, 'downloadWord']);
 Route::get('/surat/stream/{id}', [SuratCon::class, 'streamPdf']);
+Route::delete('/surat/delete/{id}', [SuratCon::class, 'destroy'])->name('surat.delete');
+Route::post('/surat/tambah', [SuratCon::class, 'tambah'])->name('surat.tambah');
 
 
 
